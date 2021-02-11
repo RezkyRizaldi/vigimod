@@ -9,6 +9,13 @@ const {
 
 // Packages
 const axios = require('axios');
+	// Axios Header
+	let config = {
+		headers: {
+			'Content-Type': 'application/json',
+		}
+	}
+	// End
 const qs = require('qs');
 
 // Environment
@@ -38,7 +45,8 @@ const {
 	PREFIX,
 	TOKEN,
 	VERIFY_SELECTION_CH,
-	VERIFY_QUEUE_CH
+	VERIFY_QUEUE_CH,
+	DB_COOLDOWN_BASE_URL
 } = require('./config.json');
 /** End Variables */
 
@@ -313,6 +321,42 @@ client.on('message', async (message) => {
 					return message.channel.send(embed);
 				}
 			break
+			case 'reject':
+				if (message.member.hasPermission("ADMINISTRATOR")) {
+				let mentionedMember = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
+				let responseStatus;
+				let responseMessage;
+				try {
+					let checkGuestData = await axios.get(DB_GUEST_BASE_URL + "/delete/" + mentionedMember.id);
+					responseStatus = checkGuestData.data.status
+					responseMessage = checkGuestData.data.message
+				} catch (error) {
+					responseStatus = error.response.data.status
+					responseMessage = error.response.data.message
+				}
+				if (responseStatus == 200){
+					console.log("disini ada data");
+					let cooldownStatus;
+					let cooldownMessage;
+					try {
+						let postUserCooldown = await axios.get(DB_COOLDOWN_BASE_URL + mentionedMember.id,config);
+						cooldownStatus = postUserCooldown.data.status;
+						cooldownMessage = postUserCooldown.data.message;
+					} catch (error) {
+						cooldownStatus = error.response.data.status;
+						cooldownMessage = error.response.data.message;
+					}
+					if (cooldownStatus == 201){
+						return message.channel.send(cooldownMessage)
+					} else {
+						return message.channel.send(cooldownMessage)
+					}
+				} else {
+					console.log(responseStatus);
+					return message.channel.send(responseMessage);
+				}
+				}
+				break
 		}
 	}
 });
