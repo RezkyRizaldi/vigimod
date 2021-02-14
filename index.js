@@ -59,7 +59,7 @@ client.on('ready', () => {
 	console.log(`${client.user.username} ${BUILD} hurung bos!`);
 	setInterval(() => {
 		client.user
-			.setActivity(`[${PREFIX}help] | ${BUILD}`, {
+			.setActivity(`${BUILD}`, {
 				type: 'PLAYING',
 			})
 			.catch((err) => console.log(err));
