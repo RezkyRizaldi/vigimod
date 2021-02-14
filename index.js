@@ -44,6 +44,7 @@ const {
 	DB_COOLDOWN_BASE_URL,
 	DB_FIND_GUEST_QUESTION_ID,
 	DB_CHECK_USER_COOLDOWN,
+	DB_CHECK_USER_DATA,
 } = require('./config.json');
 /** End Variables */
 
@@ -89,7 +90,8 @@ client.on('message', async (message) => {
 			switch (args[0]) {
 				case 'check':
 					try {
-						await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+						let checkUserCooldownStatus = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+						console.log(checkUserCooldownStatus.data);
 						return message.channel.send(
 							'Anda sedang berada dalam keadaan cooldown!\nCek terus secara berkala sampai Anda dinyatakan tidak dalam keadaan cooldown!'
 						);
@@ -164,13 +166,21 @@ client.on('message', async (message) => {
 										userRegisterData.user_answer = memberAnswer;
 										userRegisterData.question_id = id;
 										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
-										return message.author.send('Jawaban pertama terkirim!\n\n' + question);
+										return message.author.send(
+											'Jawaban pertama terkirim!\n\n' +
+												question +
+												'\n\n**HARAP PERHATIKAN JAWABAN ANDA KARENA BERSIFAT CASE SENSITIVE**\n**IKUTI SEPERTI CONTOH JIKA HURUF **Y/N** DARI CONTOH TIDAK UPPERCASE MAKA JAWAB LAH DENGAN **&answer [y/n]**'
+										);
 									} else if (question_order == 2) {
 										userRegisterData.question_order = question_order + 1;
 										userRegisterData.user_answer = memberAnswer;
 										userRegisterData.question_id = essayId;
 										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
-										return message.author.send('Jawaban kedua terkirim! Essay:\n\n' + essayQuestion);
+										return message.author.send(
+											'Jawaban kedua terkirim! Essay:\n\n' +
+												essayQuestion +
+												'\n\n**DISINI ANDA BISA MENJAWAB SESUAI PENGETAHUAN ANDA**\n**CONTOH : &answer  ini adalah jawaban saya menurut saya**'
+										);
 									}
 								} else if (question_order == 3) {
 									userRegisterData.question_order = question_order + 1;
@@ -194,7 +204,9 @@ client.on('message', async (message) => {
 									embedMod.setTitle('New Member Verification');
 									embedMod.setDescription(templateApproval);
 									testChannel.send(embedMod);
-									return message.author.send('Semua jawaban terkirim!');
+									return message.author.send(
+										'Semua jawaban terkirim!\nMohon untuk menunggu moderator mereview jawaban Anda!\nTerima Kasih!'
+									);
 								} else {
 									const getSecondarySelectionUrl = DB_SECONDARY_SELECTION_BASE_URL + question_id;
 									const secondarySelectionData = await axios.get(getSecondarySelectionUrl);
@@ -205,15 +217,22 @@ client.on('message', async (message) => {
 									const responseWrong = await axios.post(postWrongUrl, qs.stringify(userRegisterData));
 									console.log(responseWrong);
 									embedAnswer.setTitle('Pertanyaan Diulang!');
-									embedAnswer.setDescription(`${question} **[Y/N]**`);
+									embedAnswer.setDescription(
+										`${question} **[y/n]**\n\n**HARAP PERHATIKAN JAWABAN ANDA KARENA BERSIFAT CASE SENSITIVE**\n**IKUTI SEPERTI CONTOH JIKA HURUF **Y/N** DARI CONTOH TIDAK UPPERCASE MAKA JAWAB LAH DENGAN **&answer [y/n]**`
+									);
 									return message.author.send(embedAnswer);
 								}
 							} else if (wrongcount == 3) {
 								console.log('Aksi jika sudah salah 3 kali disini');
-								await axios.get(DB_COOLDOWN_BASE_URL + message.author.id, config);
+								try {
+									let postToCooldown = await axios.get(DB_COOLDOWN_BASE_URL + message.author.id);
+									console.log(postToCooldown.data);
+								} catch (error) {
+									console.log(error.response.data);
+								}
 								embedAnswer.setTitle('Anda sudah salah 3 kali!');
 								embedAnswer.setDescription(
-									`Mohon untuk menunggu beberapa saat dan daftar ulang pada channel registry!\nUntuk mengecek sudah bisa daftar ulang silahkan ketik command **&check**`
+									`Mohon untuk menunggu **1 Jam** dan daftar ulang pada channel registry!\nUntuk mengecek sudah bisa daftar ulang silahkan ketik command **&check**\nJika ada kendala mengenai bot, segera hubungi staff agar dibantu.`
 								);
 								return message.author.send(embedAnswer);
 							} else {
@@ -258,20 +277,37 @@ client.on('message', async (message) => {
 				}
 				break;
 			case 'register':
-				// Cooldown Check
-				let userCooldownStatus;
+				let checkerStatus;
+				let cooldownCheckerStatus;
+				// Check if user exists
 				try {
-					let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
-					userCooldownStatus = userCooldown.data.status;
+					let checkUser = await axios.get(DB_CHECK_USER_DATA + message.author.id);
+					checkerStatus = checkUser.data.status;
 				} catch (error) {
-					userCooldownStatus = error.response.data.status;
+					checkerStatus = error.response.data.status;
 				}
-				// End Cooldown Check
-				var payload = {};
-				const checkGuestRole = message.member.roles.cache.find((r) => r.id === GUEST_ROLE);
-				const checkMemberRole = message.member.roles.cache.find((r) => r.id === MEMBER_ROLE);
-				const guestChannelOnly = guild.channels.cache.get(VERIFY_QUEUE_CH);
-				if (!userCooldownStatus) {
+				// End user check
+				// Check user cooldown
+				try {
+					let checkUserCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+					cooldownCheckerStatus = checkUserCooldown.data.status;
+				} catch (error) {
+					cooldownCheckerStatus = error.response.data.status;
+				}
+				if (checkerStatus != 200 && cooldownCheckerStatus != true) {
+					// Cooldown Check
+					let userCooldownStatus;
+					try {
+						let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+						userCooldownStatus = userCooldown.data.status;
+					} catch (error) {
+						userCooldownStatus = error.response.data.status;
+					}
+					// End Cooldown Check
+					var payload = {};
+					const checkGuestRole = message.member.roles.cache.find((r) => r.id === GUEST_ROLE);
+					const checkMemberRole = message.member.roles.cache.find((r) => r.id === MEMBER_ROLE);
+					const guestChannelOnly = guild.channels.cache.get(VERIFY_QUEUE_CH);
 					if (message.channel.id == guestChannelOnly) {
 						const response = await axios.get(DB_RANDOM_SELECTION_BASE_URL);
 						const { question, id } = response.data[0];
@@ -296,7 +332,9 @@ client.on('message', async (message) => {
 							embed.setDescription(`**${message.author.username}**, Welcome!`);
 							message.author.send(embed).then(() => {
 								embed.setTitle('Pertanyaan Pertama');
-								embed.setDescription(`${question} **[Y/N]**`);
+								embed.setDescription(
+									`${question} **[y/n]**\n\n**HARAP PERHATIKAN JAWABAN ANDA KARENA BERSIFAT CASE SENSITIVE**\n**IKUTI SEPERTI CONTOH JIKA HURUF **Y/N** DARI CONTOH TIDAK UPPERCASE MAKA JAWAB LAH DENGAN **&answer [y/n]**`
+								);
 								message.author.send(embed);
 							});
 						}
@@ -306,8 +344,15 @@ client.on('message', async (message) => {
 						return message.channel.send(embed);
 					}
 				} else {
-					return message.channel.send('Anda sedang dalam keadaan cooldown!\nMohon tunggu beberapa saat!');
+					if (cooldownCheckerStatus == true) {
+						return message.channel.send(
+							'Anda sedang berada dalam keadaan cooldown!\nMohon untuk menunggu agar bisa registrasi ulang!'
+						);
+					} else {
+						return message.channel.send('Anda telah terdaftar!\nMohon lanjutkan proses registrasi via DM!');
+					}
 				}
+
 				break;
 			case 'approve':
 				if (message.member.hasPermission('ADMINISTRATOR')) {
@@ -342,11 +387,11 @@ client.on('message', async (message) => {
 						setTimeout(() => {
 							approveMember.roles.add(MEMBER_ROLE);
 							console.log('tambah role member');
-						}, 500);
+						}, 2000);
 						setTimeout(() => {
 							approveMember.roles.remove(GUEST_ROLE);
 							console.log('hapus role guest');
-						}, 2000);
+						}, 5000);
 						if (approveMember) {
 							embed.setDescription(`Selamat! Anda telah terdaftar di server ${message.guild.name}`);
 							return approveMember.send(embed);
@@ -392,6 +437,9 @@ client.on('message', async (message) => {
 							cooldownMessage = error.response.data.message;
 						}
 						if (cooldownStatus == 201) {
+							mentionedMember.send(
+								'Mohon maaf!\nJawaban Anda sepertinya tidak memenuhi kriteria atau Anda tidak serius menjawabnya!\nMohon untuk menunggu **1 Jam**, lalu registrasi ulang.\n Terima kasih!'
+							);
 							return message.channel.send(cooldownMessage);
 						} else {
 							return message.channel.send(cooldownMessage);
