@@ -461,16 +461,18 @@ client.on('message', async (message) => {
 
 										attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
 									}
-									let joinEmbed = new MessageEmbed()
-										.setColor(COLOR)
-										.setTimestamp()
-										.attachFiles(attachment)
-										.setImage('attachment://joined_log.png')
-										.setDescription(
-											`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
-										)
-										.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
-									joinedLog.send(joinEmbed);
+									if (joinedLog) {
+										let joinEmbed = new MessageEmbed()
+											.setColor(COLOR)
+											.setTimestamp()
+											.attachFiles(attachment)
+											.setImage('attachment://joined_log.png')
+											.setDescription(
+												`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
+											)
+											.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
+										return joinedLog.send(joinEmbed);
+									}
 
 									let chatkalemEmbed = new MessageEmbed()
 										.setColor(COLOR)
