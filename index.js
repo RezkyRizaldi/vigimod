@@ -414,65 +414,65 @@ client.on('message', async (message) => {
 									}
 									deleteMessage();
 									let attachment;
-									createCanvas();
+									// createCanvas();
 									const guild = client.guilds.cache.get(GUILD_ID);
 									const chatKalem = guild.channels.cache.get(CHAT_KALEM_CH);
 									const joinedLog = guild.channels.cache.get(JOINED_LOG_CH);
 									const rules = guild.channels.cache.get(RULES_CH);
-									async function createCanvas() {
-										const canvas = Canvas.createCanvas(1024, 500);
-										const ctx = canvas.getContext('2d');
-										const background = await Canvas.loadImage('./assets/server/joined_log.png');
-										let x = 0;
-										let y = 0;
-										ctx.drawImage(background, x, y, canvas.width, canvas.height);
+									// async function createCanvas() {
+									// 	const canvas = Canvas.createCanvas(1024, 500);
+									// 	const ctx = canvas.getContext('2d');
+									// 	const background = await Canvas.loadImage('./assets/server/joined_log.png');
+									// 	let x = 0;
+									// 	let y = 0;
+									// 	ctx.drawImage(background, x, y, canvas.width, canvas.height);
 
-										const avatar = await Canvas.loadImage(approveMember.user.displayAvatarURL({ format: 'jpg' }));
-										x = canvas.width / 2 - avatar.width / 2 - 50;
-										y = 35;
-										ctx.drawImage(avatar, x, y, 250, 250);
+									// 	const avatar = await Canvas.loadImage(approveMember.user.displayAvatarURL({ format: 'jpg' }));
+									// 	x = canvas.width / 2 - avatar.width / 2 - 50;
+									// 	y = 35;
+									// 	ctx.drawImage(avatar, x, y, 250, 250);
 
-										// ctx.beginPath();
-										// ctx.arc(x, y, 155, 0, Math.PI * 2, true);
-										// ctx.closePath();
-										// ctx.clip();
+									// 	// ctx.beginPath();
+									// 	// ctx.arc(x, y, 155, 0, Math.PI * 2, true);
+									// 	// ctx.closePath();
+									// 	// ctx.clip();
 
-										ctx.fillStyle = '#ffffff';
-										ctx.strokeStyle = '#000000';
-										ctx.lineWidth = 4;
-										ctx.font = 'bold 72px Corporate Logo Rounded';
-										let text = 'Welcome';
-										x = canvas.width / 2 - ctx.measureText(text).width / 2 - 20;
-										ctx.fillText(text.toUpperCase(), x, 245 + avatar.height);
-										ctx.strokeText(text.toUpperCase(), x, 245 + avatar.height);
-										ctx.fill();
-										ctx.stroke();
+									// 	ctx.fillStyle = '#ffffff';
+									// 	ctx.strokeStyle = '#000000';
+									// 	ctx.lineWidth = 4;
+									// 	ctx.font = 'bold 72px Corporate Logo Rounded';
+									// 	let text = 'Welcome';
+									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2 - 20;
+									// 	ctx.fillText(text.toUpperCase(), x, 245 + avatar.height);
+									// 	ctx.strokeText(text.toUpperCase(), x, 245 + avatar.height);
+									// 	ctx.fill();
+									// 	ctx.stroke();
 
-										ctx.font = 'bold 48px Corporate Logo Rounded';
-										text = `${approveMember.user.tag}`;
-										x = canvas.width / 2 - ctx.measureText(text).width / 2;
-										ctx.fillText(text, x, 300 + avatar.height);
+									// 	ctx.font = 'bold 48px Corporate Logo Rounded';
+									// 	text = `${approveMember.user.tag}`;
+									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2;
+									// 	ctx.fillText(text, x, 300 + avatar.height);
 
-										ctx.font = 'bold 32px Corporate Logo Rounded';
-										text = `Member ke-${guild.memberCount}`;
-										x = canvas.width / 2 - ctx.measureText(text).width / 2;
-										ctx.fillText(text, x, 340 + avatar.height);
-										//
+									// 	ctx.font = 'bold 32px Corporate Logo Rounded';
+									// 	text = `Member ke-${guild.memberCount}`;
+									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2;
+									// 	ctx.fillText(text, x, 340 + avatar.height);
+									// 	//
 
-										attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
-									}
-									if (joinedLog) {
-										let joinEmbed = new MessageEmbed()
-											.setColor(COLOR)
-											.setTimestamp()
-											.attachFiles(attachment)
-											.setImage('attachment://joined_log.png')
-											.setDescription(
-												`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
-											)
-											.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
-										return joinedLog.send(joinEmbed);
-									}
+									// 	attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
+									// }
+									// if (joinedLog) {
+									// 	let joinEmbed = new MessageEmbed()
+									// 		.setColor(COLOR)
+									// 		.setTimestamp()
+									// 		.attachFiles(attachment)
+									// 		.setImage('attachment://joined_log.png')
+									// 		.setDescription(
+									// 			`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
+									// 		)
+									// 		.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
+									// 	return joinedLog.send(joinEmbed);
+									// }
 
 									let chatkalemEmbed = new MessageEmbed()
 										.setColor(COLOR)
