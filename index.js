@@ -43,6 +43,7 @@ const {
 	VERIFY_QUEUE_CH,
 	DB_COOLDOWN_BASE_URL,
 	DB_FIND_GUEST_QUESTION_ID,
+	DB_CHECK_USER_COOLDOWN,
 } = require('./config.json');
 /** End Variables */
 
@@ -230,43 +231,61 @@ client.on('message', async (message) => {
 	if (message.content.startsWith(PREFIX)) {
 		let args = message.content.substring(PREFIX.length).split(/ +/);
 		switch (args[0]) {
+			case 'check':
+				try {
+					const checkCooldown =
+						message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
+					let checkUserCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + checkCooldown);
+					return message.channel.send(checkUserCooldown.data.message);
+				} catch (error) {
+					message.channel.send(error.response.data.message);
+				}
+				break;
 			case 'register':
+				// Cooldown Check
+				let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+				let userCooldownStatus = userCooldown.data.status;
+				// End Cooldown Check
 				var payload = {};
 				const checkGuestRole = message.member.roles.cache.find((r) => r.id === GUEST_ROLE);
 				const checkMemberRole = message.member.roles.cache.find((r) => r.id === MEMBER_ROLE);
 				const guestChannelOnly = guild.channels.cache.get(VERIFY_QUEUE_CH);
-				if (message.channel.id == guestChannelOnly) {
-					const response = await axios.get(DB_RANDOM_SELECTION_BASE_URL);
-					const { question, id } = response.data[0];
-					console.log(question);
-					payload.user_id = message.author.id;
-					payload.question_order = 1;
-					payload.user_tag = message.author.tag;
-					payload.user_name = message.author.username;
-					payload.user_answer = 'Init Save Data';
-					payload.question_id = id;
-					payload.wrongcount = 0;
-					if (guestChannelOnly) {
-						const postResponse = await axios.post(DB_POST_GUEST_BASE_URL, qs.stringify(payload));
-						console.log(postResponse.data);
-						embed.setTitle('Verification Step');
-						embed.setDescription(
-							`**${message.member.displayName}**, harap verifikasi diri Anda dengan menjawab pertanyaan yang telah kami kirimkan di DM!`
-						);
-						message.channel.send(embed);
-					}
-					if (message.author) {
-						embed.setDescription(`**${message.author.username}**, Welcome!`);
-						message.author.send(embed).then(() => {
-							embed.setTitle('Pertanyaan Pertama');
-							embed.setDescription(`${question} **[Y/N]**`);
-							message.author.send(embed);
-						});
+				if (!userCooldownStatus) {
+					if (message.channel.id == guestChannelOnly) {
+						const response = await axios.get(DB_RANDOM_SELECTION_BASE_URL);
+						const { question, id } = response.data[0];
+						console.log(question);
+						payload.user_id = message.author.id;
+						payload.question_order = 1;
+						payload.user_tag = message.author.tag;
+						payload.user_name = message.author.username;
+						payload.user_answer = 'Init Save Data';
+						payload.question_id = id;
+						payload.wrongcount = 0;
+						if (guestChannelOnly) {
+							const postResponse = await axios.post(DB_POST_GUEST_BASE_URL, qs.stringify(payload));
+							console.log(postResponse.data);
+							embed.setTitle('Verification Step');
+							embed.setDescription(
+								`**${message.member.displayName}**, harap verifikasi diri Anda dengan menjawab pertanyaan yang telah kami kirimkan di DM!`
+							);
+							message.channel.send(embed);
+						}
+						if (message.author) {
+							embed.setDescription(`**${message.author.username}**, Welcome!`);
+							message.author.send(embed).then(() => {
+								embed.setTitle('Pertanyaan Pertama');
+								embed.setDescription(`${question} **[Y/N]**`);
+								message.author.send(embed);
+							});
+						}
+					} else {
+						embed.setTitle('Permissions Ditolak');
+						embed.setDescription(`**${message.member.displayName}**, Anda telah terdaftar sebagai Member!`);
+						return message.channel.send(embed);
 					}
 				} else {
-					embed.setTitle('Permissions Ditolak');
-					embed.setDescription(`**${message.member.displayName}**, Anda telah terdaftar sebagai Member!`);
-					return message.channel.send(embed);
+					message.author.send('Anda sedang dalam keadaan cooldown!\nMohon tunggu beberapa saat!');
 				}
 				break;
 			case 'approve':
