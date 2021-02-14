@@ -87,6 +87,16 @@ client.on('message', async (message) => {
 		if (message.content.startsWith(`${PREFIX}`)) {
 			let args = message.content.substring(PREFIX.length).split(/ +/);
 			switch (args[0]) {
+				case 'check':
+					try {
+						await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+						return message.channel.send(
+							'Anda sedang berada dalam keadaan cooldown!\nCek terus secara berkala sampai Anda dinyatakan tidak dalam keadaan cooldown!'
+						);
+					} catch (error) {
+						message.channel.send('Selamat!\nAnda sudah bisa mendaftar ulang!');
+					}
+					break;
 				case 'answer':
 					let errorNotFound;
 					let user_id;
@@ -200,6 +210,12 @@ client.on('message', async (message) => {
 								}
 							} else if (wrongcount == 3) {
 								console.log('Aksi jika sudah salah 3 kali disini');
+								await axios.get(DB_COOLDOWN_BASE_URL + message.author.id, config);
+								embedAnswer.setTitle('Anda sudah salah 3 kali!');
+								embedAnswer.setDescription(
+									`Mohon untuk menunggu beberapa saat dan daftar ulang pada channel registry!\nUntuk mengecek sudah bisa daftar ulang silahkan ketik command **&check**`
+								);
+								return message.author.send(embedAnswer);
 							} else {
 								console.log('xxx');
 							}
@@ -243,8 +259,13 @@ client.on('message', async (message) => {
 				break;
 			case 'register':
 				// Cooldown Check
-				let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
-				let userCooldownStatus = userCooldown.data.status;
+				let userCooldownStatus;
+				try {
+					let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+					userCooldownStatus = userCooldown.data.status;
+				} catch (error) {
+					userCooldownStatus = error.response.data.status;
+				}
 				// End Cooldown Check
 				var payload = {};
 				const checkGuestRole = message.member.roles.cache.find((r) => r.id === GUEST_ROLE);
@@ -285,7 +306,7 @@ client.on('message', async (message) => {
 						return message.channel.send(embed);
 					}
 				} else {
-					message.author.send('Anda sedang dalam keadaan cooldown!\nMohon tunggu beberapa saat!');
+					return message.channel.send('Anda sedang dalam keadaan cooldown!\nMohon tunggu beberapa saat!');
 				}
 				break;
 			case 'approve':
