@@ -414,6 +414,7 @@ client.on('message', async (message) => {
 									}
 									deleteMessage();
 									let attachment;
+									createCanvas();
 									const guild = client.guilds.cache.get(GUILD_ID);
 									const chatKalem = guild.channels.cache.get(CHAT_KALEM_CH);
 									const joinedLog = guild.channels.cache.get(JOINED_LOG_CH);
@@ -460,8 +461,6 @@ client.on('message', async (message) => {
 
 										attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
 									}
-									createCanvas();
-
 									let joinEmbed = new MessageEmbed()
 										.setColor(COLOR)
 										.setTimestamp()
