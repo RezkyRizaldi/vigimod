@@ -290,19 +290,19 @@ client.on('message', async (message) => {
 				// Check user cooldown
 				try {
 					let checkUserCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+					console.log(checkUserCooldown.data);
 					cooldownCheckerStatus = checkUserCooldown.data.status;
-				} catch (error) {
-					cooldownCheckerStatus = error.response.data.status;
-				}
-				if (checkerStatus != 200 && cooldownCheckerStatus != true) {
+				} catch (error) {}
+				if (checkerStatus != 200 && cooldownCheckerStatus == null) {
+					console.log(cooldownCheckerStatus);
 					// Cooldown Check
-					let userCooldownStatus;
-					try {
-						let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
-						userCooldownStatus = userCooldown.data.status;
-					} catch (error) {
-						userCooldownStatus = error.response.data.status;
-					}
+					// let userCooldownStatus;
+					// try {
+					// 	let userCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
+					// 	userCooldownStatus = userCooldown.data.status;
+					// } catch (error) {
+					// 	userCooldownStatus = error.response.data.status;
+					// }
 					// End Cooldown Check
 					var payload = {};
 					const checkGuestRole = message.member.roles.cache.find((r) => r.id === GUEST_ROLE);
@@ -343,14 +343,12 @@ client.on('message', async (message) => {
 						embed.setDescription(`**${message.member.displayName}**, Anda telah terdaftar sebagai Member!`);
 						return message.channel.send(embed);
 					}
+				} else if (cooldownCheckerStatus != null) {
+					return message.channel.send(
+						'Anda sedang berada dalam keadaan cooldown!\nMohon untuk menunggu agar bisa registrasi ulang!'
+					);
 				} else {
-					if (cooldownCheckerStatus == true) {
-						return message.channel.send(
-							'Anda sedang berada dalam keadaan cooldown!\nMohon untuk menunggu agar bisa registrasi ulang!'
-						);
-					} else {
-						return message.channel.send('Anda telah terdaftar!\nMohon lanjutkan proses registrasi via DM!');
-					}
+					return message.channel.send('Anda telah terdaftar!\nMohon lanjutkan proses registrasi via DM!');
 				}
 
 				break;
