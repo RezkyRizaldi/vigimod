@@ -42,6 +42,7 @@ const {
 	VERIFY_SELECTION_CH,
 	VERIFY_QUEUE_CH,
 	DB_COOLDOWN_BASE_URL,
+	DB_FIND_GUEST_QUESTION_ID,
 } = require('./config.json');
 /** End Variables */
 
@@ -298,8 +299,14 @@ client.on('message', async (message) => {
 								}
 							}
 						});
-						approveMember.roles.add(MEMBER_ROLE);
-						approveMember.roles.remove(GUEST_ROLE);
+						setTimeout(() => {
+							approveMember.roles.add(MEMBER_ROLE);
+							console.log('tambah role member');
+						}, 500);
+						setTimeout(() => {
+							approveMember.roles.remove(GUEST_ROLE);
+							console.log('hapus role guest');
+						}, 2000);
 						if (approveMember) {
 							embed.setDescription(`Selamat! Anda telah terdaftar di server ${message.guild.name}`);
 							return approveMember.send(embed);
