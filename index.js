@@ -411,7 +411,7 @@ client.on('message', async (message) => {
 									let y = 0;
 									ctx.drawImage(background, x, y, canvas.width, canvas.height);
 
-									const avatar = await Canvas.loadImage(member.user.displayAvatarURL({ format: 'jpg' }));
+									const avatar = await Canvas.loadImage(approveMember.user.displayAvatarURL({ format: 'jpg' }));
 									x = (canvas.width / 2 - avatar.width / 2) - 50;
 									y = 35;
 									ctx.drawImage(avatar, x, y, 250, 250);
@@ -433,7 +433,7 @@ client.on('message', async (message) => {
 									ctx.stroke();
 
 									ctx.font = 'bold 48px Corporate Logo Rounded';
-									text = `${member.user.tag}`;
+									text = `${approveMember.user.tag}`;
 									x = canvas.width / 2 - ctx.measureText(text).width / 2;
 									ctx.fillText(text, x, 300 + avatar.height);
 
