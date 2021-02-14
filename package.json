@@ -1,0 +1,114 @@
+{
+  "name": "vigimod",
+  "displayName": "VigiMod",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./lib/index.js",
+  "types": "./lib/index.js",
+  "publisher": "VSI",
+  "description": "ModMail BOT",
+  "keywords": [
+    "BOT",
+    "Discord"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#0xffed2a",
+    "theme": "dark"
+  },
+  "homepage": "https://github.com/RezkyRizaldi/vigimod",
+  "bugs": {
+    "url": "httpss://github.com/RezkyRizaldi/vigimod/issues",
+    "email": "rezkyrizaldi30@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RezkyRizaldi/vigimod.git"
+  },
+  "engines": {
+    "node": "^12.19.0",
+    "npm": "^6.14.8",
+    "vscode": "^1.22.0"
+  },
+  "preview": true,
+  "markdown": "github",
+  "os": [
+    "win32",
+    "arch",
+    "x64",
+    "linux"
+  ],
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false,
+    "arrowParens": "always",
+    "bracketSpacing": true,
+    "cursorOffset": -1,
+    "embeddedLanguageFormatting": "auto",
+    "endOfLine": "lf",
+    "htmlWhitespaceSensitivity": "css",
+    "insertPragma": false,
+    "jsxBracketSameLine": false,
+    "jsxSingleQuote": false,
+    "printWidth": 80,
+    "proseWrap": "preserve",
+    "quoteProps": "as-needed",
+    "rangeEnd": 0,
+    "rangeStart": 0,
+    "requirePragma": false,
+    "useTabs": false,
+    "vueIndentScriptAndStyle": false
+  },
+  "qna": "marketplace",
+  "readme": ".github/README.md",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "workspaces": [
+    "./vigibot.code-workspace"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Rezky Rizaldi",
+    "url": "https://github.com/RezkyRizaldi",
+    "email": "rezkyrizaldi30@gmail.com"
+  },
+  "contributors": [
+    "Hadat hadataskywalker@gmail.com https://github.com/HadatMTCH"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown",
+    "onLanguage:javascript",
+    "onLanguage:json",
+    "onLanguage:typescript"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://www.opensource.org/licenses/mit-license.php"
+    },
+    {
+      "type": "Apache-2.0",
+      "url": "https://opensource.org/licenses/apache-2.0.php"
+    }
+  ],
+  "dependencies": {
+    "async": "^3.2.0",
+    "axios": "^0.21.1",
+    "canvas": "^2.6.1",
+    "cheerio": "^1.0.0-rc.5",
+    "common-tags": "^1.8.0",
+    "discord.js": "^12.5.1",
+    "node-fetch": "^2.6.1",
+    "qs": "^6.9.6"
+  }
+}
