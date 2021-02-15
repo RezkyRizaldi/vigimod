@@ -500,9 +500,11 @@ client.on('message', async (message) => {
 										return chatKalem.send(chatkalemEmbed);
 									}
 
-									embed.setTitle('Member Verify Approved');
-									embed.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`);
-									testChannelApprove.send(embed);
+									if (testChannelApprove) {
+										embed.setTitle('Member Verify Approved');
+										embed.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`);
+										return testChannelApprove.send(embed);
+									}
 								}
 							}
 						});
