@@ -121,163 +121,153 @@ client.on('message', async (message) => {
 					}
 					break;
 				case 'answer':
-					const checkGuestRole = message.member.roles.cache.has(GUEST_ROLE);
-					const checkMemberRole = message.member.roles.cache.has(MEMBER_ROLE);
-					if (checkGuestRole && !checkMemberRole) {
-						let errorNotFound;
-						let user_id;
-						let question_id;
-						let question_order;
-						let wrongcount;
-						let updated_at;
-						let user_name;
-						let user_tag;
-						var userRegisterData = {};
-						const postGuestUrl = DB_UPDATE_GUEST_BASE_URL + message.author.id;
-						const postWrongUrl = DB_UPDATE_WRONG_BASE_URL + message.author.id;
-						const findGuestUrl = DB_GUEST_BASE_URL + message.author.id;
-						const findGuestQuestionId = DB_FIND_GUEST_QUESTION_ID + message.author.id;
-						try {
-							const guestData = await axios.get(findGuestUrl);
-							const questionIdData = await axios.get(findGuestQuestionId);
-							console.log(questionIdData.data.question_id);
-							user_id = guestData.data.user_id;
-							question_id = questionIdData.data.question_id;
-							question_order = guestData.data.question_order;
-							wrongcount = guestData.data.wrongcount;
-							updated_at = guestData.data.updated_at;
-							user_name = guestData.data.user_name;
-							user_tag = guestData.data.user_tag;
-						} catch (error) {
-							errorNotFound = await error.response.data.status;
-						}
-						if (errorNotFound != 404) {
-							console.log(question_id);
-							const findQuestionAnswerUrl = DB_QUESTION_DEFAULT_ANSWER_BASE_URL + question_id;
-							const findQuestionAnswerData = await axios.get(findQuestionAnswerUrl);
-							const { defaultAnswer } = findQuestionAnswerData.data;
-							const getRnadomEssayUrl = DB_RANDOM_ESSAY_BASE_URL;
-							const response = await axios.get(getRnadomEssayUrl);
-							const essayQuestion = response.data[0].question;
-							const essayId = response.data[0].id;
-	
-							let memberAnswer = args.slice(1).join(' ');
-							console.log(memberAnswer);
-							if (!memberAnswer) {
-								embedAnswer.setTitle('Permissions Ditolak');
-								embedAnswer.setDescription('Harap masukkan jawaban Anda dengan benar dan tepat!');
-								return message.author.send(embedAnswer);
-							} 
+					let errorNotFound;
+					let user_id;
+					let question_id;
+					let question_order;
+					let wrongcount;
+					let updated_at;
+					let user_name;
+					let user_tag;
+					var userRegisterData = {};
+					const postGuestUrl = DB_UPDATE_GUEST_BASE_URL + message.author.id;
+					const postWrongUrl = DB_UPDATE_WRONG_BASE_URL + message.author.id;
+					const findGuestUrl = DB_GUEST_BASE_URL + message.author.id;
+					const findGuestQuestionId = DB_FIND_GUEST_QUESTION_ID + message.author.id;
+					try {
+						const guestData = await axios.get(findGuestUrl);
+						const questionIdData = await axios.get(findGuestQuestionId);
+						console.log(questionIdData.data.question_id);
+						user_id = guestData.data.user_id;
+						question_id = questionIdData.data.question_id;
+						question_order = guestData.data.question_order;
+						wrongcount = guestData.data.wrongcount;
+						updated_at = guestData.data.updated_at;
+						user_name = guestData.data.user_name;
+						user_tag = guestData.data.user_tag;
+					} catch (error) {
+						errorNotFound = await error.response.data.status;
+					}
+					if (errorNotFound != 404) {
+						console.log(question_id);
+						const findQuestionAnswerUrl = DB_QUESTION_DEFAULT_ANSWER_BASE_URL + question_id;
+						const findQuestionAnswerData = await axios.get(findQuestionAnswerUrl);
+						const { defaultAnswer } = findQuestionAnswerData.data;
+						const getRnadomEssayUrl = DB_RANDOM_ESSAY_BASE_URL;
+						const response = await axios.get(getRnadomEssayUrl);
+						const essayQuestion = response.data[0].question;
+						const essayId = response.data[0].id;
 
-							if (!memberAnswer && checkMemberRole && !checkGuestRole) {
-								embedAnswer.setTitle('Permissions Ditolak');
-								embedAnswer.setDescription('Anda telah terdaftar sebagai Member!');
-								return message.author.send(embedAnswer);
-							}
-	
-							if (question_order <= 3) {
-								if (wrongcount < 3) {
-									console.log(defaultAnswer);
-									console.log(memberAnswer);
-									if (memberAnswer.toLowerCase() == defaultAnswer) {
-										userRegisterData.user_id = message.author.id;
-										userRegisterData.user_tag = message.author.tag;
-										userRegisterData.user_name = message.author.username;
-										if (question_order == 1) {
-											const getSecondarySelectionUrl = DB_SECONDARY_SELECTION_BASE_URL + question_id;
-											const secondarySelectionData = await axios.get(getSecondarySelectionUrl);
-											const { question, id } = secondarySelectionData.data[0];
-											userRegisterData.question_order = question_order + 1;
-											userRegisterData.user_answer = memberAnswer;
-											userRegisterData.question_id = id;
-											await axios.post(postGuestUrl, qs.stringify(userRegisterData));
-											message.author.send('Jawaban Pertama Terkirim');
-											embedAnswer.setTitle('Pertanyaan Kedua');
-											embedAnswer.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
-											return message.author.send(embedAnswer);
-										} else if (question_order == 2) {
-											userRegisterData.question_order = question_order + 1;
-											userRegisterData.user_answer = memberAnswer;
-											userRegisterData.question_id = essayId;
-											await axios.post(postGuestUrl, qs.stringify(userRegisterData));
-											message.author.send('Jawaban Kedua Terkirim');
-											embedAnswer.setTitle('Pertanyaan Ketiga');
-											embedAnswer.setDescription(
-												`${essayQuestion}\n\n*jawab dengan benar dan tepat. mis. \`&answer jawaban saya\`*`
-											);
-											return message.author.send(embedAnswer);
-										}
-									} else if (question_order == 3) {
+						let memberAnswer = args.slice(1).join(' ');
+						console.log(memberAnswer);
+						if (!memberAnswer) {
+							embedAnswer.setTitle('Permissions Ditolak');
+							embedAnswer.setDescription('Harap masukkan jawaban Anda dengan benar dan tepat!');
+							return message.author.send(embedAnswer);
+						} 
+
+						if (!memberAnswer && checkMemberRole && !checkGuestRole) {
+							embedAnswer.setTitle('Permissions Ditolak');
+							embedAnswer.setDescription('Anda telah terdaftar sebagai Member!');
+							return message.author.send(embedAnswer);
+						}
+
+						if (question_order <= 3) {
+							if (wrongcount < 3) {
+								console.log(defaultAnswer);
+								console.log(memberAnswer);
+								if (memberAnswer.toLowerCase() == defaultAnswer) {
+									userRegisterData.user_id = message.author.id;
+									userRegisterData.user_tag = message.author.tag;
+									userRegisterData.user_name = message.author.username;
+									if (question_order == 1) {
+										const getSecondarySelectionUrl = DB_SECONDARY_SELECTION_BASE_URL + question_id;
+										const secondarySelectionData = await axios.get(getSecondarySelectionUrl);
+										const { question, id } = secondarySelectionData.data[0];
+										userRegisterData.question_order = question_order + 1;
+										userRegisterData.user_answer = memberAnswer;
+										userRegisterData.question_id = id;
+										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
+										message.author.send('Jawaban Pertama Terkirim');
+										embedAnswer.setTitle('Pertanyaan Kedua');
+										embedAnswer.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
+										return message.author.send(embedAnswer);
+									} else if (question_order == 2) {
 										userRegisterData.question_order = question_order + 1;
 										userRegisterData.user_answer = memberAnswer;
 										userRegisterData.question_id = essayId;
 										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
-										const sendModUserQuestionId = question_id;
-										const questionResponse = await axios.get(DB_QUESTION_BASE_URL + sendModUserQuestionId);
-										const sendModQuestionData = questionResponse.data.question; // Send This instead of id
-										const sendModUsername = user_name;
-										const sendModUserTag = user_tag;
-										const sendModUserCreatedAt = updated_at;
-										const sendModUserAnswer = memberAnswer;
-										const templateApproval = `Ada Guest yang melakukan registrasi dengan data sebagai berikut:\nID User : **${message.author.id}**\nUser Tag : **${sendModUserTag}**\nUsername : **${sendModUsername}**\nTanggal Pendaftaran: **${sendModUserCreatedAt}**\nDengan pertanyaan : **${sendModQuestionData}**\nJawaban: **${sendModUserAnswer}**`;
-										const testChannel = guild.channels.cache.get(VERIFY_SELECTION_CH);
-										let embedMod = new MessageEmbed();
-										embedMod.setTitle('New Member Verification');
-										embedMod.setDescription(templateApproval);
-										testChannel.send(embedMod);
-										embedAnswer.setTitle('Verification Steps Success');
+										message.author.send('Jawaban Kedua Terkirim');
+										embedAnswer.setTitle('Pertanyaan Ketiga');
 										embedAnswer.setDescription(
-											'Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!'
+											`${essayQuestion}\n\n*jawab dengan benar dan tepat. mis. \`&answer jawaban saya\`*`
 										);
 										return message.author.send(embedAnswer);
-									} else {
-										const getSecondarySelectionUrl = DB_SECONDARY_SELECTION_BASE_URL + question_id;
-										const secondarySelectionData = await axios.get(getSecondarySelectionUrl);
-										const { question, id } = secondarySelectionData.data[0];
-										let incrementWrongCount = wrongcount + 1;
-										userRegisterData.question_id = id;
-										userRegisterData.wrongcount = incrementWrongCount;
-										const responseWrong = await axios.post(postWrongUrl, qs.stringify(userRegisterData));
-										console.log(responseWrong);
-										message.author.send('jawaban tidak tepat!');
-										embedAnswer.setTitle('Pertanyaan Diulang');
-										embedAnswer.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
-										return message.author.send(embedAnswer);
 									}
-								} else if (wrongcount == 3) {
-									try {
-										let postToCooldown = await axios.get(DB_COOLDOWN_BASE_URL + message.author.id);
-										console.log(postToCooldown.data);
-									} catch (error) {
-										console.log(error.response.data);
-									}
-									embedAnswer.setTitle('Verification Steps Failed');
+								} else if (question_order == 3) {
+									userRegisterData.question_order = question_order + 1;
+									userRegisterData.user_answer = memberAnswer;
+									userRegisterData.question_id = essayId;
+									await axios.post(postGuestUrl, qs.stringify(userRegisterData));
+									const sendModUserQuestionId = question_id;
+									const questionResponse = await axios.get(DB_QUESTION_BASE_URL + sendModUserQuestionId);
+									const sendModQuestionData = questionResponse.data.question; // Send This instead of id
+									const sendModUsername = user_name;
+									const sendModUserTag = user_tag;
+									const sendModUserCreatedAt = updated_at;
+									const sendModUserAnswer = memberAnswer;
+									const templateApproval = `Ada Guest yang melakukan registrasi dengan data sebagai berikut:\nID User : **${message.author.id}**\nUser Tag : **${sendModUserTag}**\nUsername : **${sendModUsername}**\nTanggal Pendaftaran: **${sendModUserCreatedAt}**\nDengan pertanyaan : **${sendModQuestionData}**\nJawaban: **${sendModUserAnswer}**`;
+									const testChannel = guild.channels.cache.get(VERIFY_SELECTION_CH);
+									let embedMod = new MessageEmbed();
+									embedMod.setTitle('New Member Verification');
+									embedMod.setDescription(templateApproval);
+									testChannel.send(embedMod);
+									embedAnswer.setTitle('Verification Steps Success');
 									embedAnswer.setDescription(
-										'Mohon untuk menunggu **1 Jam** dan registrasi ulang pada channel <#805149942926147584>\nUntuk mengetahui status Cooldown ketikkan Command `&check`\nJika menemukan kendala mengenai BOT, segera hubungi <@&721652835518906379> agar dibantu.'
+										'Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!'
 									);
 									return message.author.send(embedAnswer);
 								} else {
-									return;
+									const getSecondarySelectionUrl = DB_SECONDARY_SELECTION_BASE_URL + question_id;
+									const secondarySelectionData = await axios.get(getSecondarySelectionUrl);
+									const { question, id } = secondarySelectionData.data[0];
+									let incrementWrongCount = wrongcount + 1;
+									userRegisterData.question_id = id;
+									userRegisterData.wrongcount = incrementWrongCount;
+									const responseWrong = await axios.post(postWrongUrl, qs.stringify(userRegisterData));
+									console.log(responseWrong);
+									message.author.send('jawaban tidak tepat!');
+									embedAnswer.setTitle('Pertanyaan Diulang');
+									embedAnswer.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
+									return message.author.send(embedAnswer);
 								}
-							} else {
-								embedAnswer.setTitle('Verification Steps Success');
+							} else if (wrongcount == 3) {
+								try {
+									let postToCooldown = await axios.get(DB_COOLDOWN_BASE_URL + message.author.id);
+									console.log(postToCooldown.data);
+								} catch (error) {
+									console.log(error.response.data);
+								}
+								embedAnswer.setTitle('Verification Steps Failed');
 								embedAnswer.setDescription(
-									'Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!'
+									'Mohon untuk menunggu **1 Jam** dan registrasi ulang pada channel <#805149942926147584>\nUntuk mengetahui status Cooldown ketikkan Command `&check`\nJika menemukan kendala mengenai BOT, segera hubungi <@&721652835518906379> agar dibantu.'
 								);
 								return message.author.send(embedAnswer);
+							} else {
+								return;
 							}
 						} else {
-							console.log('data tidak terdaftar!');
-							embedAnswer.setTitle('Permissions Ditolak');
-							embedAnswer.setDescription('Anda harus melakukan registrasi terlebih dahulu di <#805149942926147584>');
-							message.author.send(embedAnswer);
+							embedAnswer.setTitle('Verification Steps Success');
+							embedAnswer.setDescription(
+								'Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!'
+							);
+							return message.author.send(embedAnswer);
 						}
-					} else if (checkMemberRole) {
-						embedAnswer.setTitle('Permissions Ditolak');
-						embedAnswer.setDescription('Anda telah terdaftar sebagai Member!');
-						message.author.send(embedAnswer);
 					} else {
-						return;
+						console.log('data tidak terdaftar!');
+						embedAnswer.setTitle('Permissions Ditolak');
+						embedAnswer.setDescription('Anda harus melakukan registrasi terlebih dahulu di <#805149942926147584>');
+						message.author.send(embedAnswer);
 					}
 				break
 			}
@@ -433,66 +423,66 @@ client.on('message', async (message) => {
 										}
 									}
 									deleteMessage();
-									let attachment;
-									createCanvas();
+									// let attachment;
+									// createCanvas();
 									const guild = client.guilds.cache.get(GUILD_ID);
 									const chatKalem = guild.channels.cache.get(CHAT_KALEM_CH);
-									const joinedLog = guild.channels.cache.get(JOINED_LOG_CH);
+									// const joinedLog = guild.channels.cache.get(JOINED_LOG_CH);
 									const rules = guild.channels.cache.get(RULES_CH);
-									async function createCanvas() {
-										const canvas = Canvas.createCanvas(1024, 500);
-										const ctx = canvas.getContext('2d');
-										const background = await Canvas.loadImage('./assets/joined_log.png');
-										let x = 0;
-										let y = 0;
-										ctx.drawImage(background, x, y, canvas.width, canvas.height);
+									// async function createCanvas() {
+									// 	const canvas = Canvas.createCanvas(1024, 500);
+									// 	const ctx = canvas.getContext('2d');
+									// 	const background = await Canvas.loadImage('./assets/joined_log.png');
+									// 	let x = 0;
+									// 	let y = 0;
+									// 	ctx.drawImage(background, x, y, canvas.width, canvas.height);
 
-										const avatar = await Canvas.loadImage(approveMember.user.displayAvatarURL({ format: 'jpg' }));
-										x = canvas.width / 2 - avatar.width / 2 - 50;
-										y = 35;
-										ctx.drawImage(avatar, x, y, 250, 250);
+									// 	const avatar = await Canvas.loadImage(approveMember.user.displayAvatarURL({ format: 'jpg' }));
+									// 	x = canvas.width / 2 - avatar.width / 2 - 50;
+									// 	y = 35;
+									// 	ctx.drawImage(avatar, x, y, 250, 250);
 
-										// ctx.beginPath();
-										// ctx.arc(x, y, 155, 0, Math.PI * 2, true);
-										// ctx.closePath();
-										// ctx.clip();
+									// 	// ctx.beginPath();
+									// 	// ctx.arc(x, y, 155, 0, Math.PI * 2, true);
+									// 	// ctx.closePath();
+									// 	// ctx.clip();
 
-										ctx.fillStyle = '#ffffff';
-										ctx.strokeStyle = '#000000';
-										ctx.lineWidth = 4;
-										ctx.font = 'bold 72px Corporate Logo Rounded';
-										let text = 'Welcome';
-										x = canvas.width / 2 - ctx.measureText(text).width / 2 - 20;
-										ctx.fillText(text.toUpperCase(), x, 245 + avatar.height);
-										ctx.strokeText(text.toUpperCase(), x, 245 + avatar.height);
-										ctx.fill();
-										ctx.stroke();
+									// 	ctx.fillStyle = '#ffffff';
+									// 	ctx.strokeStyle = '#000000';
+									// 	ctx.lineWidth = 4;
+									// 	ctx.font = 'bold 72px Corporate Logo Rounded';
+									// 	let text = 'Welcome';
+									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2 - 20;
+									// 	ctx.fillText(text.toUpperCase(), x, 245 + avatar.height);
+									// 	ctx.strokeText(text.toUpperCase(), x, 245 + avatar.height);
+									// 	ctx.fill();
+									// 	ctx.stroke();
 
-										ctx.font = 'bold 48px Corporate Logo Rounded';
-										text = `${approveMember.user.tag}`;
-										x = canvas.width / 2 - ctx.measureText(text).width / 2;
-										ctx.fillText(text, x, 300 + avatar.height);
+									// 	ctx.font = 'bold 48px Corporate Logo Rounded';
+									// 	text = `${approveMember.user.tag}`;
+									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2;
+									// 	ctx.fillText(text, x, 300 + avatar.height);
 
-										ctx.font = 'bold 32px Corporate Logo Rounded';
-										text = `Member ke-${guild.memberCount}`;
-										x = canvas.width / 2 - ctx.measureText(text).width / 2;
-										ctx.fillText(text, x, 340 + avatar.height);
-										//
+									// 	ctx.font = 'bold 32px Corporate Logo Rounded';
+									// 	text = `Member ke-${guild.memberCount}`;
+									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2;
+									// 	ctx.fillText(text, x, 340 + avatar.height);
+									// 	//
 
-										attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
-									}
-									if (joinedLog) {
-										let joinEmbed = new MessageEmbed()
-											.setColor(COLOR)
-											.setTimestamp()
-											.attachFiles(attachment)
-											.setImage('attachment://joined_log.png')
-											.setDescription(
-												`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
-											)
-											.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
-										return joinedLog.send(joinEmbed);
-									}
+									// 	attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
+									// }
+									// if (joinedLog) {
+									// 	let joinEmbed = new MessageEmbed()
+									// 		.setColor(COLOR)
+									// 		.setTimestamp()
+									// 		.attachFiles(attachment)
+									// 		.setImage('attachment://joined_log.png')
+									// 		.setDescription(
+									// 			`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
+									// 		)
+									// 		.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
+									// 	return joinedLog.send(joinEmbed);
+									// }
 
 									let chatkalemEmbed = new MessageEmbed()
 										.setColor(COLOR)
