@@ -389,7 +389,7 @@ client.on('message', async (message) => {
 					}
 				}
 				break;
-			case 'terima':
+			case 'approve':
 				if (message.member.hasPermission('ADMINISTRATOR')) {
 					const targetedGuildApprove = client.guilds.cache.get(GUILD_ID);
 					const approveMember = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
@@ -476,7 +476,7 @@ client.on('message', async (message) => {
 					return message.channel.send(embed);
 				}
 				break;
-			case 'tolak':
+			case 'reject':
 				if (message.member.hasPermission('ADMINISTRATOR')) {
 					const targetedGuildReject = client.guilds.cache.get(GUILD_ID);
 					const mentionedMember = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
