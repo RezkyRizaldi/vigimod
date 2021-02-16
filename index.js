@@ -39,12 +39,12 @@ const {
 	MessageEmbed
 } = require('discord.js');
 const axios = require('axios');
-const qs = require('qs');
 let config = {
 	headers: {
 		'Content-Type': 'application/json',
 	},
 };
+const qs = require('qs');
 
 // Environment
 const client = new Client({
@@ -195,9 +195,7 @@ client.on('message', async (message) => {
 										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
 										message.author.send('Jawaban Kedua Terkirim');
 										embedAnswer.setTitle('Pertanyaan Ketiga');
-										embedAnswer.setDescription(
-											`${essayQuestion}\n\n*jawab dengan benar dan tepat. mis. \`&answer jawaban saya\`*`
-										);
+										embedAnswer.setDescription(`${essayQuestion}\n\n*jawab dengan benar dan tepat. mis. \`&answer jawaban saya\`*`);
 										return message.author.send(embedAnswer);
 									}
 								} else if (question_order == 3) {
@@ -207,21 +205,22 @@ client.on('message', async (message) => {
 									await axios.post(postGuestUrl, qs.stringify(userRegisterData));
 									const sendModUserQuestionId = question_id;
 									const questionResponse = await axios.get(DB_QUESTION_BASE_URL + sendModUserQuestionId);
-									const sendModQuestionData = questionResponse.data.question; // Send This instead of id
+									const sendModQuestionData = questionResponse.data.question;
 									const sendModUsername = user_name;
 									const sendModUserTag = user_tag;
 									const sendModUserCreatedAt = updated_at;
 									const sendModUserAnswer = memberAnswer;
-									const templateApproval = `Ada Guest yang melakukan registrasi dengan data sebagai berikut:\nID User : **${message.author.id}**\nUser Tag : **${sendModUserTag}**\nUsername : **${sendModUsername}**\nTanggal Pendaftaran: **${sendModUserCreatedAt}**\nDengan pertanyaan : **${sendModQuestionData}**\nJawaban: **${sendModUserAnswer}**`;
+									const templateApproval = `Ada Guest yang melakukan registrasi dengan data sebagai berikut:\nID User: **${message.author.id}**\nUser Tag: **${sendModUserTag}**\nUsername: **${sendModUsername}**\nTanggal Pendaftaran: **${sendModUserCreatedAt}**\nPertanyaan: **${sendModQuestionData}**\nJawaban: **${sendModUserAnswer}**`;
 									const testChannel = guild.channels.cache.get(VERIFY_SELECTION_CH);
 									let embedMod = new MessageEmbed();
+									embedMod.setColor(COLOR);
+									embedMod.setTimestamp();
+									embedMod.setFooter(`Created by ${hadat} & ${kiw}`, client.user.displayAvatarURL({ dynamic: true }));
 									embedMod.setTitle('New Member Verification');
 									embedMod.setDescription(templateApproval);
 									testChannel.send(embedMod);
 									embedAnswer.setTitle('Verification Steps Success');
-									embedAnswer.setDescription(
-										'Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!'
-									);
+									embedAnswer.setDescription('Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!');
 									return message.author.send(embedAnswer);
 								} else {
 									const getSecondarySelectionUrl = DB_SECONDARY_SELECTION_BASE_URL + question_id;
@@ -245,18 +244,14 @@ client.on('message', async (message) => {
 									console.log(error.response.data);
 								}
 								embedAnswer.setTitle('Verification Steps Failed');
-								embedAnswer.setDescription(
-									'Mohon untuk menunggu **1 Jam** dan registrasi ulang pada channel <#805149942926147584>\nUntuk mengetahui status Cooldown ketikkan Command `&check`\nJika menemukan kendala mengenai BOT, segera hubungi <@&721652835518906379> agar dibantu.'
-								);
+								embedAnswer.setDescription('Mohon untuk menunggu **1 Jam** dan registrasi ulang pada channel <#805149942926147584>\nUntuk mengetahui status Cooldown ketikkan Command `&check`\nJika menemukan kendala mengenai BOT, segera hubungi <@&721652835518906379> agar dibantu.');
 								return message.author.send(embedAnswer);
 							} else {
 								return;
 							}
 						} else {
 							embedAnswer.setTitle('Verification Steps Success');
-							embedAnswer.setDescription(
-								'Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!'
-							);
+							embedAnswer.setDescription('Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!');
 							return message.author.send(embedAnswer);
 						}
 					} else {
@@ -285,8 +280,7 @@ client.on('message', async (message) => {
 		const verifyQueueCh = guild.channels.cache.get(VERIFY_SELECTION_CH);
 		switch (args[0]) {
 			case 'check':
-				const checkCooldown =
-					message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
+				const checkCooldown = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
 
 				if (!checkCooldown) {
 					embed.setTitle('Permissions Ditolak');
@@ -360,7 +354,7 @@ client.on('message', async (message) => {
 							message.channel.send(embed);
 						}
 						if (message.author) {
-							embed.setTitle("Verification Step")
+							embed.setTitle("Verification Step");
 							embed.setDescription(`**${message.author.username}**, harap jawab pertanyaan-pertanyaan berikut dengan benar dan tepat!`);
 							message.author.send(embed).then(() => {
 								embed.setTitle('Pertanyaan Pertama');
@@ -376,15 +370,11 @@ client.on('message', async (message) => {
 				} else {
 					if (cooldownCheckerStatus == true) {
 						embed.setTitle('Permissions Ditolak');
-						embed.setDescription(
-							`**${message.member.displayName}**, Anda sedang dikenakan Cooldown! Harap tunggu selama beberapa jam agar dapat kembali melakukan registrasi.`
-						);
+						embed.setDescription(`**${message.member.displayName}**, Anda sedang dikenakan Cooldown! Harap tunggu selama beberapa jam agar dapat kembali melakukan registrasi.`);
 						return message.channel.send(embed);
 					} else {
 						embed.setTitle('Permissions Ditolak');
-						embed.setDescription(
-							`**${message.member.displayName}**, Anda telah teregistrasi! Harap lanjutkan proses verifikasi via DM.`
-						);
+						embed.setDescription(`**${message.member.displayName}**, Anda telah teregistrasi! Harap lanjutkan proses verifikasi via DM.`);
 						return message.channel.send(embed);
 					}
 				}
@@ -403,6 +393,7 @@ client.on('message', async (message) => {
 
 					const checkGuestRoleApprove = approveMember.roles.cache.has(GUEST_ROLE);
 					const checkMemberRoleApprove = approveMember.roles.cache.has(MEMBER_ROLE);
+
 					if (message.channel.id == testChannelApprove.id && checkGuestRoleApprove && !checkMemberRoleApprove) {
 						const getThisMessage = await testChannelApprove.messages.fetch();
 						getThisMessage.forEach((mess) => {
@@ -419,10 +410,10 @@ client.on('message', async (message) => {
 										}
 									}
 									deleteMessage();
-
 									const guild = client.guilds.cache.get(GUILD_ID);
 									const chatKalem = guild.channels.cache.get(CHAT_KALEM_CH);
 									const rules = guild.channels.cache.get(RULES_CH);
+									
 									let chatkalemEmbed = new MessageEmbed()
 										.setColor(COLOR)
 										.setTimestamp()
@@ -436,29 +427,23 @@ client.on('message', async (message) => {
 										chatkalemEmbed.setDescription(
 											`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
 										);
-										chatKalem.send(chatkalemEmbed);
+										return chatKalem.send(chatkalemEmbed);
 									}
-
-									const approveEmbed = new MessageEmbed()
-										.setColor(COLOR)
-										.setTitle('Member Verify Approved')
-										.setTimestamp()
-										.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`)
-										.setFooter(`Created by ${hadat} & ${kiw}`, client.user.displayAvatarURL({ dynamic: true }));
-									message.channel.send(approveEmbed);
 								}
 							}
 						});
+						embed.setTitle('Member Verify Approved');
+						embed.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`);
 						setTimeout(() => {
 							approveMember.roles.add(MEMBER_ROLE);
 							console.log('tambah role member');
-						}, 2000);
+						}, 2000).then(message.channel.send(embed));
 						setTimeout(() => {
 							approveMember.roles.remove(GUEST_ROLE);
 							console.log('hapus role guest');
 						}, 5000);
 						if (approveMember) {
-							embed.setTitle("Member Verify Approved");
+							embed.setTitle("Verify Member Approved");
 							embed.setDescription(`Selamat! Anda telah terdaftar di server ${message.guild.name}`);
 							return approveMember.send(embed);
 						}
@@ -470,12 +455,10 @@ client.on('message', async (message) => {
 					}
 				} else {
 					embed.setTitle('Permissions Ditolak');
-					embed.setDescription(
-						`**${message.member.displayName}**, Anda tidak memiliki perms untuk menggunakan fitur ini!`
-					);
+					embed.setDescription(`**${message.member.displayName}**, Anda tidak memiliki perms untuk menggunakan fitur ini!`);
 					return message.channel.send(embed);
 				}
-				break;
+				break
 			case 'reject':
 				if (message.member.hasPermission('ADMINISTRATOR')) {
 					const targetedGuildReject = client.guilds.cache.get(GUILD_ID);
@@ -492,77 +475,47 @@ client.on('message', async (message) => {
 					const checkMemberRoleReject = mentionedMember.roles.cache.has(MEMBER_ROLE);
 					let responseStatus;
 					let responseMessage;
-
 					if (message.channel.id == testChannelReject.id && checkGuestRoleReject && !checkMemberRoleReject) {
-						const getThisMessage = await testChannelReject.messages.fetch();
-						getThisMessage.forEach((mess) => {
-							for (var i = 0; i < mess.embeds.length; i++) {
-								if (mess.embeds[i].description.includes(mentionedMember.id)) {
-									async function deleteMessage() {
-										try {
-											let checkGuestData = await axios.get(DB_DELETE_BASE_URL + mentionedMember.id);
-											responseStatus = checkGuestData.data.status;
-											responseMessage = checkGuestData.data.message;
-											if (mess.deletable) mess.delete();
-										} catch (error) {
-											console.log(error);
-											responseStatus = error.response.data.status;
-											responseMessage = error.response.data.message;
-										}
-									}
-									deleteMessage();
-									if (responseStatus == 200) {
-										console.log('disini ada data');
-										let cooldownStatus;
-										let cooldownMessage;
-										async function addGuestCooldown() {
-											try {
-												let postUserCooldown = await axios.get(DB_COOLDOWN_BASE_URL + mentionedMember.id, config);
-												cooldownStatus = postUserCooldown.data.status;
-												cooldownMessage = postUserCooldown.data.message;
-											} catch (error) {
-												cooldownStatus = error.response.data.status;
-												cooldownMessage = error.response.data.message;
-											}
-										}
-										addGuestCooldown();
-										if (cooldownStatus == 201) {
-											if (mentionedMember) {
-												embed.setTitle('Member Verify Rejected');
-												embed.setDescription(
-													'Jawaban Anda sepertinya tidak memenuhi kriteria atau Anda tidak serius menjawabnya! Mohon untuk menunggu Cooldown selama **1 Jam** untuk kembali registrasi ulang. Terima kasih!'
-												);
-												mentionedMember.send(embed);
-											}
-											embed.setTitle('Member Verify Rejected');
-											embed.setDescription(`${mentionedMember} berhasil direject, ${cooldownMessage}`);
-											return testChannelReject.send(embed);
-										} else {
-											embed.setTitle('Cooldown Unable');
-											embed.setDescription(cooldownMessage);
-											return testChannelReject.send(embed);
-										}
-									} else {
-										console.log(responseStatus);
-										embed.setTitle('User Tidak Ditemukan');
-										embed.setDescription(responseMessage);
-										return testChannelReject.send(embed);
-									}
-								}
-							}
-						});
+						try {
+							let checkGuestData = await axios.get(DB_DELETE_BASE_URL + mentionedMember.id);
+							responseStatus = checkGuestData.data.status;
+							responseMessage = checkGuestData.data.message;
+						} catch (error) {
+							responseStatus = error.response.data.status;
+							responseMessage = error.response.data.message;
+						}
+
+						embed.setTitle('Verify Member Rejected');
+						embed.setDescription('Jawaban Anda sepertinya tidak memenuhi kriteria atau Anda tidak serius menjawabnya! Mohon untuk menunggu Cooldown selama **1 Jam** untuk kembali registrasi ulang. Mohon maaf.');
+						mentionedMember.send(embed);
+					}
+					if (responseStatus == 200) {
+						console.log('disini ada data');
+						let cooldownStatus;
+						let cooldownMessage;
+						try {
+							let postUserCooldown = await axios.get(DB_COOLDOWN_BASE_URL + mentionedMember.id, config);
+							cooldownStatus = postUserCooldown.data.status;
+							cooldownMessage = postUserCooldown.data.message;
+						} catch (error) {
+							cooldownStatus = error.response.data.status;
+							cooldownMessage = error.response.data.message;
+						}
+						if (cooldownStatus == 201) {
+							embed.setTitle('Verify Member Rejected');
+							embed.setDescription(`${mentionedMember} telah berhasil direject. ${cooldownMessage}`);
+							return testChannelReject.send(embed);
+						} else {
+							embed.setTitle('Cooldown Unable');
+							embed.setDescription(cooldownMessage);
+							return testChannelReject.send(embed);
+						}
 					} else {
-						console.log('dia sudah member dan bukan guest!');
-						embed.setTitle('Permissions Ditolak');
-						embed.setDescription(`${mentionedMember} sudah terdaftar dalam list Cooldown`);
+						console.log(responseStatus);
+						embed.setTitle('User Tidak Ditemukan');
+						embed.setDescription(responseMessage);
 						return testChannelReject.send(embed);
 					}
-				} else {
-					embed.setTitle('Permissions Ditolak');
-					embed.setDescription(
-						`**${message.member.displayName}**, Anda tidak memiliki perms untuk menggunakan fitur ini!`
-					);
-					return message.channel.send(embed);
 				}
 			break
 		}
