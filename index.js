@@ -1,30 +1,5 @@
 /** Variables */
-// Discord.js Classes
-const {
-	Client,
-	Collection,
-	MessageAttachment,
-	MessageEmbed
-} = require('discord.js');
-
-// Packages
-const axios = require('axios');
-// Axios Header
-let config = {
-	headers: {
-		'Content-Type': 'application/json',
-	},
-};
-// End
-const qs = require('qs');
-const Canvas = require('canvas');
-
-// Environment
-const client = new Client({
-	disableEveryone: true,
-});
-client.commands = new Collection();
-
+// Locale Modules
 // BOT Configuration
 const {
 	BUILD,
@@ -46,7 +21,6 @@ const {
 	DB_QUESTION_DEFAULT_ANSWER_BASE_URL,
 	GUILD_ID,
 	GUEST_ROLE,
-	JOINED_LOG_CH,
 	MEMBER_ROLE,
 	NAME,
 	PREFIX,
@@ -55,6 +29,28 @@ const {
 	VERIFY_SELECTION_CH,
 	VERIFY_QUEUE_CH,
 } = require('./config.json');
+
+// Third Party Modules
+// Discord.js Classes
+const {
+	Client,
+	Collection,
+	MessageAttachment,
+	MessageEmbed
+} = require('discord.js');
+const axios = require('axios');
+const qs = require('qs');
+let config = {
+	headers: {
+		'Content-Type': 'application/json',
+	},
+};
+
+// Environment
+const client = new Client({
+	disableEveryone: true,
+});
+client.commands = new Collection();
 /** End Variables */
 
 /** Events */
@@ -364,7 +360,8 @@ client.on('message', async (message) => {
 							message.channel.send(embed);
 						}
 						if (message.author) {
-							embed.setDescription(`**${message.author.username}**, Welcome!`);
+							embed.setTitle("Verification Step")
+							embed.setDescription(`**${message.author.username}**, harap jawab pertanyaan-pertanyaan berikut dengan benar dan tepat!`);
 							message.author.send(embed).then(() => {
 								embed.setTitle('Pertanyaan Pertama');
 								embed.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
@@ -392,13 +389,10 @@ client.on('message', async (message) => {
 					}
 				}
 				break;
-			case 'approve':
+			case 'terima':
 				if (message.member.hasPermission('ADMINISTRATOR')) {
 					const targetedGuildApprove = client.guilds.cache.get(GUILD_ID);
-					const approveMember =
-						message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
-					const checkGuestRoleApprove = approveMember.roles.cache.has(GUEST_ROLE);
-					const checkMemberRoleApprove = approveMember.roles.cache.has(MEMBER_ROLE);
+					const approveMember = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
 					const testChannelApprove = targetedGuildApprove.channels.cache.get(VERIFY_SELECTION_CH);
 
 					if (!approveMember) {
@@ -407,6 +401,8 @@ client.on('message', async (message) => {
 						return testChannelApprove.send(embed);
 					}
 
+					const checkGuestRoleApprove = approveMember.roles.cache.has(GUEST_ROLE);
+					const checkMemberRoleApprove = approveMember.roles.cache.has(MEMBER_ROLE);
 					if (message.channel.id == testChannelApprove.id && checkGuestRoleApprove && !checkMemberRoleApprove) {
 						const getThisMessage = await testChannelApprove.messages.fetch();
 						getThisMessage.forEach((mess) => {
@@ -423,67 +419,10 @@ client.on('message', async (message) => {
 										}
 									}
 									deleteMessage();
-									// let attachment;
-									// createCanvas();
+
 									const guild = client.guilds.cache.get(GUILD_ID);
 									const chatKalem = guild.channels.cache.get(CHAT_KALEM_CH);
-									// const joinedLog = guild.channels.cache.get(JOINED_LOG_CH);
 									const rules = guild.channels.cache.get(RULES_CH);
-									// async function createCanvas() {
-									// 	const canvas = Canvas.createCanvas(1024, 500);
-									// 	const ctx = canvas.getContext('2d');
-									// 	const background = await Canvas.loadImage('./assets/joined_log.png');
-									// 	let x = 0;
-									// 	let y = 0;
-									// 	ctx.drawImage(background, x, y, canvas.width, canvas.height);
-
-									// 	const avatar = await Canvas.loadImage(approveMember.user.displayAvatarURL({ format: 'jpg' }));
-									// 	x = canvas.width / 2 - avatar.width / 2 - 50;
-									// 	y = 35;
-									// 	ctx.drawImage(avatar, x, y, 250, 250);
-
-									// 	// ctx.beginPath();
-									// 	// ctx.arc(x, y, 155, 0, Math.PI * 2, true);
-									// 	// ctx.closePath();
-									// 	// ctx.clip();
-
-									// 	ctx.fillStyle = '#ffffff';
-									// 	ctx.strokeStyle = '#000000';
-									// 	ctx.lineWidth = 4;
-									// 	ctx.font = 'bold 72px Corporate Logo Rounded';
-									// 	let text = 'Welcome';
-									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2 - 20;
-									// 	ctx.fillText(text.toUpperCase(), x, 245 + avatar.height);
-									// 	ctx.strokeText(text.toUpperCase(), x, 245 + avatar.height);
-									// 	ctx.fill();
-									// 	ctx.stroke();
-
-									// 	ctx.font = 'bold 48px Corporate Logo Rounded';
-									// 	text = `${approveMember.user.tag}`;
-									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2;
-									// 	ctx.fillText(text, x, 300 + avatar.height);
-
-									// 	ctx.font = 'bold 32px Corporate Logo Rounded';
-									// 	text = `Member ke-${guild.memberCount}`;
-									// 	x = canvas.width / 2 - ctx.measureText(text).width / 2;
-									// 	ctx.fillText(text, x, 340 + avatar.height);
-									// 	//
-
-									// 	attachment = new MessageAttachment(canvas.toBuffer(), './assets/joined_log.png', 'joined_log.png');
-									// }
-									// if (joinedLog) {
-									// 	let joinEmbed = new MessageEmbed()
-									// 		.setColor(COLOR)
-									// 		.setTimestamp()
-									// 		.attachFiles(attachment)
-									// 		.setImage('attachment://joined_log.png')
-									// 		.setDescription(
-									// 			`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
-									// 		)
-									// 		.setFooter(`${NAME} | ${BUILD}`, client.user.displayAvatarURL({ dynamic: true }));
-									// 	return joinedLog.send(joinEmbed);
-									// }
-
 									let chatkalemEmbed = new MessageEmbed()
 										.setColor(COLOR)
 										.setTimestamp()
@@ -497,7 +436,7 @@ client.on('message', async (message) => {
 										chatkalemEmbed.setDescription(
 											`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
 										);
-										return chatKalem.send(chatkalemEmbed);
+										chatKalem.send(chatkalemEmbed);
 									}
 
 									const approveEmbed = new MessageEmbed()
@@ -506,7 +445,7 @@ client.on('message', async (message) => {
 										.setTimestamp()
 										.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`)
 										.setFooter(`Created by ${hadat} & ${kiw}`, client.user.displayAvatarURL({ dynamic: true }));
-									return message.channel.send(approveEmbed);
+									message.channel.send(approveEmbed);
 								}
 							}
 						});
@@ -519,6 +458,7 @@ client.on('message', async (message) => {
 							console.log('hapus role guest');
 						}, 5000);
 						if (approveMember) {
+							embed.setTitle("Member Verify Approved");
 							embed.setDescription(`Selamat! Anda telah terdaftar di server ${message.guild.name}`);
 							return approveMember.send(embed);
 						}
@@ -536,16 +476,11 @@ client.on('message', async (message) => {
 					return message.channel.send(embed);
 				}
 				break;
-			case 'reject':
+			case 'tolak':
 				if (message.member.hasPermission('ADMINISTRATOR')) {
 					const targetedGuildReject = client.guilds.cache.get(GUILD_ID);
-					const mentionedMember =
-						message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
-					const checkGuestRoleReject = mentionedMember.roles.cache.has(GUEST_ROLE);
-					const checkMemberRoleReject = mentionedMember.roles.cache.has(MEMBER_ROLE);
+					const mentionedMember = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
 					const testChannelReject = targetedGuildReject.channels.cache.get(VERIFY_SELECTION_CH);
-					let responseStatus;
-					let responseMessage;
 
 					if (!mentionedMember) {
 						embed.setTitle('Permissions Ditolak');
@@ -553,52 +488,83 @@ client.on('message', async (message) => {
 						return testChannelReject.send(embed);
 					}
 
+					const checkGuestRoleReject = mentionedMember.roles.cache.has(GUEST_ROLE);
+					const checkMemberRoleReject = mentionedMember.roles.cache.has(MEMBER_ROLE);
+					let responseStatus;
+					let responseMessage;
+
 					if (message.channel.id == testChannelReject.id && checkGuestRoleReject && !checkMemberRoleReject) {
-						try {
-							let checkGuestData = await axios.get(DB_DELETE_BASE_URL + mentionedMember.id);
-							responseStatus = checkGuestData.data.status;
-							responseMessage = checkGuestData.data.message;
-						} catch (error) {
-							responseStatus = error.response.data.status;
-							responseMessage = error.response.data.message;
-						}
-					}
-					if (responseStatus == 200) {
-						console.log('disini ada data');
-						let cooldownStatus;
-						let cooldownMessage;
-						try {
-							let postUserCooldown = await axios.get(DB_COOLDOWN_BASE_URL + mentionedMember.id, config);
-							cooldownStatus = postUserCooldown.data.status;
-							cooldownMessage = postUserCooldown.data.message;
-						} catch (error) {
-							cooldownStatus = error.response.data.status;
-							cooldownMessage = error.response.data.message;
-						}
-						if (cooldownStatus == 201) {
-							if (mentionedMember) {
-								embed.setTitle('Permissions Ditolak');
-								embed.setDescription(
-									'Jawaban Anda sepertinya tidak memenuhi kriteria atau Anda tidak serius menjawabnya! Mohon untuk menunggu Cooldown selama **1 Jam** untuk kembali registrasi ulang. Terima kasih!'
-								);
-								mentionedMember.send(embed);
+						const getThisMessage = await testChannelReject.messages.fetch();
+						getThisMessage.forEach((mess) => {
+							for (var i = 0; i < mess.embeds.length; i++) {
+								if (mess.embeds[i].description.includes(mentionedMember.id)) {
+									async function deleteMessage() {
+										try {
+											let checkGuestData = await axios.get(DB_DELETE_BASE_URL + mentionedMember.id);
+											responseStatus = checkGuestData.data.status;
+											responseMessage = checkGuestData.data.message;
+											if (mess.deletable) mess.delete();
+										} catch (error) {
+											console.log(error);
+											responseStatus = error.response.data.status;
+											responseMessage = error.response.data.message;
+										}
+									}
+									deleteMessage();
+									if (responseStatus == 200) {
+										console.log('disini ada data');
+										let cooldownStatus;
+										let cooldownMessage;
+										async function addGuestCooldown() {
+											try {
+												let postUserCooldown = await axios.get(DB_COOLDOWN_BASE_URL + mentionedMember.id, config);
+												cooldownStatus = postUserCooldown.data.status;
+												cooldownMessage = postUserCooldown.data.message;
+											} catch (error) {
+												cooldownStatus = error.response.data.status;
+												cooldownMessage = error.response.data.message;
+											}
+										}
+										addGuestCooldown();
+										if (cooldownStatus == 201) {
+											if (mentionedMember) {
+												embed.setTitle('Member Verify Rejected');
+												embed.setDescription(
+													'Jawaban Anda sepertinya tidak memenuhi kriteria atau Anda tidak serius menjawabnya! Mohon untuk menunggu Cooldown selama **1 Jam** untuk kembali registrasi ulang. Terima kasih!'
+												);
+												mentionedMember.send(embed);
+											}
+											embed.setTitle('Member Verify Rejected');
+											embed.setDescription(`${mentionedMember} berhasil direject, ${cooldownMessage}`);
+											return testChannelReject.send(embed);
+										} else {
+											embed.setTitle('Cooldown Unable');
+											embed.setDescription(cooldownMessage);
+											return testChannelReject.send(embed);
+										}
+									} else {
+										console.log(responseStatus);
+										embed.setTitle('User Tidak Ditemukan');
+										embed.setDescription(responseMessage);
+										return testChannelReject.send(embed);
+									}
+								}
 							}
-							embed.setTitle('Permissions Ditolak');
-							embed.setDescription(cooldownMessage);
-							return testChannelReject.send(embed);
-						} else {
-							embed.setTitle('Cooldown Unable');
-							embed.setDescription(cooldownMessage);
-							return testChannelReject.send(embed);
-						}
+						});
 					} else {
-						console.log(responseStatus);
-						embed.setTitle('User Tidak Ditemukan');
-						embed.setDescription(responseMessage);
+						console.log('dia sudah member dan bukan guest!');
+						embed.setTitle('Permissions Ditolak');
+						embed.setDescription(`${mentionedMember} sudah terdaftar dalam list Cooldown`);
 						return testChannelReject.send(embed);
 					}
+				} else {
+					embed.setTitle('Permissions Ditolak');
+					embed.setDescription(
+						`**${message.member.displayName}**, Anda tidak memiliki perms untuk menggunakan fitur ini!`
+					);
+					return message.channel.send(embed);
 				}
-				break;
+			break
 		}
 	}
 });
