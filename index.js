@@ -432,12 +432,14 @@ client.on('message', async (message) => {
 								}
 							}
 						});
-						embed.setTitle('Member Verify Approved');
-						embed.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`);
+					
 						setTimeout(() => {
+							embed.setTitle('Member Verify Approved');
+							embed.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`);
 							approveMember.roles.add(MEMBER_ROLE);
 							console.log('tambah role member');
-						}, 2000).then(message.channel.send(embed));
+							message.channel.send(embed);
+						}, 2000);
 						setTimeout(() => {
 							approveMember.roles.remove(GUEST_ROLE);
 							console.log('hapus role guest');
@@ -447,6 +449,7 @@ client.on('message', async (message) => {
 							embed.setDescription(`Selamat! Anda telah terdaftar di server ${message.guild.name}`);
 							return approveMember.send(embed);
 						}
+						
 					} else {
 						console.log('dia sudah member dan bukan guest!');
 						embed.setTitle('Permissions Ditolak');
