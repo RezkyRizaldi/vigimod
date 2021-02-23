@@ -104,14 +104,12 @@ client.on('message', async (message) => {
 					try {
 						let checkUserCooldownStatus = await axios.get(DB_CHECK_USER_COOLDOWN + message.author.id);
 						console.log(checkUserCooldownStatus.data);
-						embedAnswer.setTitle('Permissions Ditolak');
-						embedAnswer.setDescription(
-							`**${message.member.displayName}**, Anda sedang dikenakan Cooldown! Harap tunggu selama beberapa jam agar dapat kembali melakukan registrasi.`
-						);
+						embedAnswer.setTitle(':warning:\r\rPermissions Rejected');
+						embedAnswer.setDescription(`**${message.member.displayName}**, Anda sedang dikenakan Cooldown! Harap tunggu selama beberapa jam agar dapat kembali melakukan registrasi.`);
 						return message.author.send(embedAnswer);
 					} catch (err) {
 						console.log(err);
-						embedAnswer.setTitle('Status Cooldown Removed');
+						embedAnswer.setTitle(':bar_chart:\r\rStatus Cooldown Removed');
 						embedAnswer.setDescription('Anda sudah bisa melakukan registrasi ulang.');
 						message.author.send(embedAnswer);
 					}
@@ -157,13 +155,13 @@ client.on('message', async (message) => {
 						let memberAnswer = args.slice(1).join(' ');
 						console.log(memberAnswer);
 						if (!memberAnswer) {
-							embedAnswer.setTitle('Permissions Ditolak');
+							embedAnswer.setTitle(':warning:\r\rPermissions Rejected');
 							embedAnswer.setDescription('Harap masukkan jawaban Anda dengan benar dan tepat!');
 							return message.author.send(embedAnswer);
 						} 
 
 						if (!memberAnswer && checkMemberRole && !checkGuestRole) {
-							embedAnswer.setTitle('Permissions Ditolak');
+							embedAnswer.setTitle(':warning:\r\rPermissions Rejected');
 							embedAnswer.setDescription('Anda telah terdaftar sebagai Member!');
 							return message.author.send(embedAnswer);
 						}
@@ -185,7 +183,7 @@ client.on('message', async (message) => {
 										userRegisterData.question_id = id;
 										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
 										message.author.send('Jawaban Pertama Terkirim');
-										embedAnswer.setTitle('Pertanyaan Kedua');
+										embedAnswer.setTitle(':question:\r\rPertanyaan Kedua');
 										embedAnswer.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
 										return message.author.send(embedAnswer);
 									} else if (question_order == 2) {
@@ -194,7 +192,7 @@ client.on('message', async (message) => {
 										userRegisterData.question_id = essayId;
 										await axios.post(postGuestUrl, qs.stringify(userRegisterData));
 										message.author.send('Jawaban Kedua Terkirim');
-										embedAnswer.setTitle('Pertanyaan Ketiga');
+										embedAnswer.setTitle(':question:\r\rPertanyaan Ketiga');
 										embedAnswer.setDescription(`${essayQuestion}\n\n*jawab dengan benar dan tepat. mis. \`&answer jawaban saya\`*`);
 										return message.author.send(embedAnswer);
 									}
@@ -216,10 +214,10 @@ client.on('message', async (message) => {
 									embedMod.setColor(COLOR);
 									embedMod.setTimestamp();
 									embedMod.setFooter(`Created by ${hadat} & ${kiw}`, client.user.displayAvatarURL({ dynamic: true }));
-									embedMod.setTitle('New Member Verification');
+									embedMod.setTitle(':information_source:\r\rNew Member Verification');
 									embedMod.setDescription(templateApproval);
 									testChannel.send(embedMod);
-									embedAnswer.setTitle('Verification Steps Success');
+									embedAnswer.setTitle(':white_check_mark:\r\rVerification Steps Success');
 									embedAnswer.setDescription('Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!');
 									return message.author.send(embedAnswer);
 								} else {
@@ -232,7 +230,7 @@ client.on('message', async (message) => {
 									const responseWrong = await axios.post(postWrongUrl, qs.stringify(userRegisterData));
 									console.log(responseWrong);
 									message.author.send('jawaban tidak tepat!');
-									embedAnswer.setTitle('Pertanyaan Diulang');
+									embedAnswer.setTitle(':repeat_one:\r\rPertanyaan Diulang');
 									embedAnswer.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
 									return message.author.send(embedAnswer);
 								}
@@ -243,20 +241,20 @@ client.on('message', async (message) => {
 								} catch (error) {
 									console.log(error.response.data);
 								}
-								embedAnswer.setTitle('Verification Steps Failed');
+								embedAnswer.setTitle(':negative_squared_cross_mark:\r\rVerification Steps Failed');
 								embedAnswer.setDescription('Mohon untuk menunggu **1 Jam** dan registrasi ulang pada channel <#805149942926147584>\nUntuk mengetahui status Cooldown ketikkan Command `&check`\nJika menemukan kendala mengenai BOT, segera hubungi <@&721652835518906379> agar dibantu.');
 								return message.author.send(embedAnswer);
 							} else {
 								return;
 							}
 						} else {
-							embedAnswer.setTitle('Verification Steps Success');
+							embedAnswer.setTitle(':white_check_mark:\r\rVerification Steps Success');
 							embedAnswer.setDescription('Semua jawaban Anda telah terkirim! Mohon untuk menunggu Moderator dalam me-review jawaban Anda. Terima kasih!');
 							return message.author.send(embedAnswer);
 						}
 					} else {
 						console.log('data tidak terdaftar!');
-						embedAnswer.setTitle('Permissions Ditolak');
+						embedAnswer.setTitle(':closed_lock_with_key:\r\rPermissions Rejected');
 						embedAnswer.setDescription('Anda harus melakukan registrasi terlebih dahulu di <#805149942926147584>');
 						message.author.send(embedAnswer);
 					}
@@ -283,20 +281,20 @@ client.on('message', async (message) => {
 				const checkCooldown = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
 
 				if (!checkCooldown) {
-					embed.setTitle('Permissions Ditolak');
+					embed.setTitle(':bust_in_silhouette:\r\rUser Not Found');
 					embed.setDescription(`**${message.member.displayName}**, harap mention Guest yang ingin dicek!`);
 					return verifyQueueCh.send(embed);
 				}
 
 				try {
 					let checkUserCooldown = await axios.get(DB_CHECK_USER_COOLDOWN + checkCooldown);
-					embed.setTitle('Cooldown Enable');
+					embed.setTitle(':stopwatch:\r\rCooldown Enable');
 					embed.setDescription(`**${checkCooldown}** sedang dalam status Cooldown\n${checkUserCooldown.data.message}`);
 					console.log(checkUserCooldown.data.message);
 					return verifyQueueCh.send(embed);
 				} catch (error) {
 					console.log(error.response.data.message);
-					embed.setTitle('Cooldown Unable');
+					embed.setTitle(':stopwatch:\r\rCooldown Unable');
 					embed.setDescription(`**${checkCooldown}** tidak terdaftar dalam list Cooldown`);
 					verifyQueueCh.send(embed);
 				}
@@ -347,33 +345,31 @@ client.on('message', async (message) => {
 						if (guestChannelOnly) {
 							const postResponse = await axios.post(DB_POST_GUEST_BASE_URL, qs.stringify(payload));
 							console.log(postResponse.data);
-							embed.setTitle('Verification Step');
-							embed.setDescription(
-								`**${message.member.displayName}**, harap verifikasi diri Anda dengan menjawab pertanyaan yang telah kami kirimkan via DM!`
-							);
+							embed.setTitle(':key:\r\rVerification Steps');
+							embed.setDescription(`**${message.member.displayName}**, harap verifikasi diri Anda dengan menjawab pertanyaan yang telah kami kirimkan via DM`);
 							message.channel.send(embed);
 						}
 						if (message.author) {
-							embed.setTitle("Verification Step");
+							embed.setTitle(":key:\r\rVerification Steps");
 							embed.setDescription(`**${message.author.username}**, harap jawab pertanyaan-pertanyaan berikut dengan benar dan tepat!`);
 							message.author.send(embed).then(() => {
-								embed.setTitle('Pertanyaan Pertama');
+								embed.setTitle(':question:\r\rPertanyaan Pertama');
 								embed.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
 								message.author.send(embed);
 							});
 						}
 					} else {
-						embed.setTitle('Permissions Ditolak');
+						embed.setTitle(':closed_lock_with_key:\r\rPermissions Rejected');
 						embed.setDescription(`**${message.member.displayName}**, Anda telah terdaftar sebagai Member!`);
 						return message.channel.send(embed);
 					}
 				} else {
 					if (cooldownCheckerStatus == true) {
-						embed.setTitle('Permissions Ditolak');
+						embed.setTitle(':closed_lock_with_key:\r\rPermissions Rejected');
 						embed.setDescription(`**${message.member.displayName}**, Anda sedang dikenakan Cooldown! Harap tunggu selama beberapa jam agar dapat kembali melakukan registrasi.`);
 						return message.channel.send(embed);
 					} else {
-						embed.setTitle('Permissions Ditolak');
+						embed.setTitle(':closed_lock_with_key:\r\rPermissions Rejected');
 						embed.setDescription(`**${message.member.displayName}**, Anda telah teregistrasi! Harap lanjutkan proses verifikasi via DM.`);
 						return message.channel.send(embed);
 					}
@@ -386,7 +382,7 @@ client.on('message', async (message) => {
 					const testChannelApprove = targetedGuildApprove.channels.cache.get(VERIFY_SELECTION_CH);
 
 					if (!approveMember) {
-						embed.setTitle('Permissions Ditolak');
+						embed.setTitle(':warning:\r\rPermissions Rejected');
 						embed.setDescription(`**${message.member.displayName}**, harap mention Guest yang ingin diapprove!`);
 						return testChannelApprove.send(embed);
 					}
@@ -424,9 +420,7 @@ client.on('message', async (message) => {
 										chatkalemEmbed.attachFiles(attachment);
 										chatkalemEmbed.setImage('attachment://welcome.png');
 										chatkalemEmbed.setAuthor('New Member', approveMember.user.displayAvatarURL({ dynamic: true }));
-										chatkalemEmbed.setDescription(
-											`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`
-										);
+										chatkalemEmbed.setDescription(`Welkam di **${message.guild.name}**, **${approveMember.user.username}**! Mohon untuk pahami ${rules} terlebih dahulu, terima kasih.`);
 										return chatKalem.send(chatkalemEmbed);
 									}
 								}
@@ -434,7 +428,7 @@ client.on('message', async (message) => {
 						});
 					
 						setTimeout(() => {
-							embed.setTitle('Member Verify Approved');
+							embed.setTitle(':white_check_mark:\r\rMember Verify Approved');
 							embed.setDescription(`${approveMember} berhasil didaftarkan sebagai Member!`);
 							approveMember.roles.add(MEMBER_ROLE);
 							console.log('tambah role member');
@@ -445,19 +439,19 @@ client.on('message', async (message) => {
 							console.log('hapus role guest');
 						}, 5000);
 						if (approveMember) {
-							embed.setTitle("Verify Member Approved");
+							embed.setTitle(":white_check_mark:\r\rVerify Member Approved");
 							embed.setDescription(`Selamat! Anda telah terdaftar di server ${message.guild.name}`);
 							return approveMember.send(embed);
 						}
 						
 					} else {
 						console.log('dia sudah member dan bukan guest!');
-						embed.setTitle('Permissions Ditolak');
+						embed.setTitle(':warning:\r\rPermissions Rejected');
 						embed.setDescription(`${approveMember} sudah terdaftar sebagai Member`);
 						return testChannelApprove.send(embed);
 					}
 				} else {
-					embed.setTitle('Permissions Ditolak');
+					embed.setTitle(':closed_lock_with_key:\r\rPermissions Rejected');
 					embed.setDescription(`**${message.member.displayName}**, Anda tidak memiliki perms untuk menggunakan fitur ini!`);
 					return message.channel.send(embed);
 				}
@@ -469,7 +463,7 @@ client.on('message', async (message) => {
 					const testChannelReject = targetedGuildReject.channels.cache.get(VERIFY_SELECTION_CH);
 
 					if (!mentionedMember) {
-						embed.setTitle('Permissions Ditolak');
+						embed.setTitle(':warning:\r\rPermissions Rejected');
 						embed.setDescription(`**${message.member.displayName}**, harap mention Guest yang ingin direject!`);
 						return testChannelReject.send(embed);
 					}
@@ -488,7 +482,7 @@ client.on('message', async (message) => {
 							responseMessage = error.response.data.message;
 						}
 
-						embed.setTitle('Verify Member Rejected');
+						embed.setTitle(':negative_squared_cross_mark:\r\rMember Verify Rejected');
 						embed.setDescription('Jawaban Anda sepertinya tidak memenuhi kriteria atau Anda tidak serius menjawabnya! Mohon untuk menunggu Cooldown selama **1 Jam** untuk kembali registrasi ulang. Mohon maaf.');
 						mentionedMember.send(embed);
 					}
@@ -505,17 +499,17 @@ client.on('message', async (message) => {
 							cooldownMessage = error.response.data.message;
 						}
 						if (cooldownStatus == 201) {
-							embed.setTitle('Verify Member Rejected');
+							embed.setTitle(':negative_squared_cross_mark:\r\rMember Verify Rejected');
 							embed.setDescription(`${mentionedMember} telah berhasil direject. ${cooldownMessage}`);
 							return testChannelReject.send(embed);
 						} else {
-							embed.setTitle('Cooldown Unable');
+							embed.setTitle(':stopwatch:\r\rCooldown Unable');
 							embed.setDescription(cooldownMessage);
 							return testChannelReject.send(embed);
 						}
 					} else {
 						console.log(responseStatus);
-						embed.setTitle('User Tidak Ditemukan');
+						embed.setTitle(':bust_in_silhouette:\r\rUser Not Found');
 						embed.setDescription(responseMessage);
 						return testChannelReject.send(embed);
 					}
