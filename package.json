@@ -102,6 +102,7 @@
     }
   ],
   "dependencies": {
+    "@vitalets/google-translate-api": "^5.0.0",
     "async": "^3.2.0",
     "axios": "^0.21.1",
     "canvas": "^2.6.1",

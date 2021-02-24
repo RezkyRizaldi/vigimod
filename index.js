@@ -277,6 +277,26 @@ client.on('message', async (message) => {
 		let args = message.content.substring(PREFIX.length).split(/ +/);
 		const verifyQueueCh = guild.channels.cache.get(VERIFY_SELECTION_CH);
 		switch (args[0]) {
+			// case 'translate':
+			// 	let payloadTranslate = {}
+			// 	let fromLang = args[1];
+			// 	let toLang = args[2];
+			// 	let content =  args.slice(3).join(' ');
+			// 	payloadTranslate.content = content;
+			// 	try {
+      //     const response = await axios({
+      //       method: 'post',
+      //       url: "https://vigidb-v2.hadatmtch.net/translate/" + fromLang + "/" + toLang,
+      //       data: qs.stringify(payloadTranslate),
+      //       headers: {
+      //         'content-type': 'application/x-www-form-urlencoded;charset=utf-8'
+      //       }
+      //     });
+      //     return message.channel.send(response.data.translatedContent);
+      //   } catch (err) {
+			// 		return console.log(err);
+      //   }
+			// 	break
 			case 'check':
 				const checkCooldown = message.guild.member(message.mentions.members.first()) || message.guild.members.cache.get(args[1]);
 
@@ -355,7 +375,11 @@ client.on('message', async (message) => {
 							message.author.send(embed).then(() => {
 								embed.setTitle(':question:  Pertanyaan Pertama');
 								embed.setDescription(`${question}\n\n*jawablah dengan \`&answer y\` atau \`&answer n\`*`);
-								message.author.send(embed);
+								setTimeout(() => {
+									message.author.send(embed).catch(error => {
+										message.channel.send("Akun Anda bermasalah!\n Harap untuk membuka akses dm dari semua user!");
+									});
+								}, 2000);
 							});
 						}
 					} else {
